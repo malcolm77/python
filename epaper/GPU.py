@@ -40,6 +40,17 @@ def get_gtemp():
         gtemp = 0
   return str(gtemp) + " C"
 
+def get_gfan():
+  url = requests.get("http://mcpc:9835/metrics")
+  for line in url.text.splitlines():
+    if "nvidia_smi_fan_speed_ratio{uuid=\"72f02a28-5140-325e-ba49-1ae77c6b4e30\"}" in line:
+      try:
+        print(line)
+        gtemp = int(line[-2:])
+      except:
+        gtemp = 0
+  return str(gtemp) + " %"
+
 def cleanup():
   epd.init()
   epd.Clear(0xFF)
@@ -72,6 +83,7 @@ try:
         time_draw.rectangle((0, 0, 250, 122), fill = 255)
         time_draw.text((12, 8), get_gpu(), font = myfont, fill = 0)
         time_draw.text((12, 8+font_height), get_gtemp(), font = myfont, fill = 0)
+        time_draw.text((150, 8), get_gfan(), font = myfont, fill = 0)
         epd.displayPartial(epd.getbuffer(time_image))
         num = num + 1
     
