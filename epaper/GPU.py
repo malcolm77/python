@@ -84,6 +84,7 @@ try:
         time_draw.text((12, 8), get_gpu(), font = myfont, fill = 0)
         time_draw.text((12, 8+font_height), get_gtemp(), font = myfont, fill = 0)
         time_draw.text((150, 8), get_gfan(), font = myfont, fill = 0)
+        time_draw.text((130, 8+font_height), time.strftime('%H:%M'), font = myfont, fill = 0)
         epd.displayPartial(epd.getbuffer(time_image))
         num = num + 1
     
