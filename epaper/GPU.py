@@ -40,6 +40,11 @@ def get_gtemp():
         gtemp = 0
   return str(gtemp) + " C"
 
+def cleanup():
+  epd.init()
+  epd.Clear(0xFF)
+  epd.sleep()
+  epd2in13_V3.epdconfig.module_exit(cleanup=True)
 
 try:
     # setup
@@ -82,5 +87,6 @@ except IOError as e:
     
 except KeyboardInterrupt:    
     logging.info("ctrl + c:")
-    epd2in13_V3.epdconfig.module_exit(cleanup=True)
+    # epd2in13_V3.epdconfig.module_exit(cleanup=True)
+    cleanup()
     exit()
