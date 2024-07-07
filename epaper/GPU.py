@@ -19,36 +19,45 @@ logging.basicConfig(level=logging.INFO)
 font_height = 48
 
 def get_gpu():
-  url = requests.get("http://mcpc:9835/metrics")
-  for line in url.text.splitlines():
-    if "nvidia_smi_utilization_gpu_ratio{uuid=\"72f02a28-5140-325e-ba49-1ae77c6b4e30\"}" in line:
-      try:
-        gpu = int(line[-2:])
-        # print(str(gpu) + "%" )
-      except:
-        gpu = 0
+  try:
+    url = requests.get("http://mcpc:9835/metrics",timeout=5)
+    for line in url.text.splitlines():
+      if "nvidia_smi_utilization_gpu_ratio{uuid=\"72f02a28-5140-325e-ba49-1ae77c6b4e30\"}" in line:
+        # print(line)
+        try:
+          gpu = int(line[-2:])
+          # print(str(gpu) + "%" )
+        except:
+          gpu = 0
+  except:
+    gpu = 0
   return str(gpu) + " %"
 
 def get_gtemp():
-  url = requests.get("http://mcpc:9835/metrics")
-  for line in url.text.splitlines():
-    if "nvidia_smi_temperature_gpu{uuid=\"72f02a28-5140-325e-ba49-1ae77c6b4e30\"}" in line:
-      try:
-        # print(line)
-        gtemp = int(line[-2:])
-      except:
-        gtemp = 0
+  try:
+    url = requests.get("http://mcpc:9835/metrics",timeout=5)
+    for line in url.text.splitlines():
+      if "nvidia_smi_temperature_gpu{uuid=\"72f02a28-5140-325e-ba49-1ae77c6b4e30\"}" in line:
+        try:
+          # print(line)
+          gtemp = int(line[-2:])
+        except:
+          gtemp = 0
+  except:
+    gtemp = 0
   return str(gtemp) + " C"
 
 def get_gfan():
-  url = requests.get("http://mcpc:9835/metrics")
-  for line in url.text.splitlines():
-    if "nvidia_smi_fan_speed_ratio{uuid=\"72f02a28-5140-325e-ba49-1ae77c6b4e30\"}" in line:
-      try:
-        print(line)
-        gtemp = int(line[-2:])
-      except:
-        gtemp = 0
+  try:
+    url = requests.get("http://mcpc:9835/metrics",timeout=5)
+    for line in url.text.splitlines():
+      if "nvidia_smi_fan_speed_ratio{uuid=\"72f02a28-5140-325e-ba49-1ae77c6b4e30\"}" in line:
+        try:
+          gtemp = int(line[-2:])
+        except:
+          gtemp = 0
+  except:
+    gtemp = 0
   return str(gtemp) + " %"
 
 def cleanup():
@@ -56,6 +65,7 @@ def cleanup():
   epd.Clear(0xFF)
   epd.sleep()
   epd2in13_V3.epdconfig.module_exit(cleanup=True)
+
 
 try:
     # setup
@@ -70,9 +80,10 @@ try:
 
     # define fonts
     myfont = ImageFont.truetype('/usr/local/share/fonts/Font.ttc', font_height)
+    smallfont = ImageFont.truetype('/usr/local/share/fonts/Font.ttc', 12)
 
     # partial update
-    logging.info("4.show time...")
+    logging.info("Getting GPU info...")
     time_image = Image.new('1', (epd.height, epd.width), 255)
     time_draw = ImageDraw.Draw(time_image)
 
@@ -81,12 +92,20 @@ try:
     while (True):
         # time_draw.rectangle((12, 8, 220, 105), fill = 255)
         time_draw.rectangle((0, 0, 250, 122), fill = 255)
+
+        time_draw.text((12,0), "GPU usage", font = smallfont, fill = 0)
         time_draw.text((12, 8), get_gpu(), font = myfont, fill = 0)
+
+        time_draw.text((12,font_height+font_height+12), "GPU Temp", font = smallfont, fill = 0)
         time_draw.text((12, 8+font_height), get_gtemp(), font = myfont, fill = 0)
-        time_draw.text((150, 8), get_gfan(), font = myfont, fill = 0)
-        time_draw.text((130, 8+font_height), time.strftime('%H:%M'), font = myfont, fill = 0)
+
+        time_draw.text((130,0), "FAN Speed", font = smallfont, fill = 0)
+        time_draw.text((130, 8), get_gfan(), font = myfont, fill = 0)
+
+        time_draw.text((130, 8+font_height), time.strftime('%I:%M'), font = myfont, fill = 0)
+
         epd.displayPartial(epd.getbuffer(time_image))
-        num = num + 1
+        time.sleep(10)
     
     logging.info("Clear...")
     epd.init()
