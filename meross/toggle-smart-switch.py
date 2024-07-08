@@ -19,6 +19,7 @@ async def main():
     # Retrieve all the MSS310 devices that are registered on this account
     await manager.async_device_discovery()
     plugs = manager.find_devices(device_type="mss210")
+    pplugs = manager.find_devices(device_type="mss210p")
 
     if len(plugs) < 1:
         print("No MSS310 plugs found...")
@@ -31,19 +32,26 @@ async def main():
         #  connection goes down)
         await dev.async_update()
 
-        # Party Lights (mss210): OnlineStatus.ONLINE ( 2106075239879690852248e1e9722751 )
-        # Workshop Power Point (mss210p): OnlineStatus.ONLINE ( 2309069934761851070348e1e9d98391 )
-        # Outlet 1 (mss210): OnlineStatus.ONLINE ( 2201055377768890865248e1e98469d4 )
+        # Smart Plug #4 (mss210): OnlineStatus.ONLINE ( 2201055377768890865248e1e98469d4 )
+        # Smart Plug #1 Party Lights (mss210): OnlineStatus.ONLINE ( 2106075239879690852248e1e9722751 )
+        # Smart Plug #3 Werebear (mss210): OnlineStatus.ONLINE ( 2106074309706690852248e1e97229bb )
+        # Smart Plug #2 DL360 (mss210p): OnlineStatus.ONLINE ( 2309069934761851070348e1e9d98391 )
+        # Smart Plug #6 (mss210p): OnlineStatus.ONLINE ( 2311169817714451070148e1e9e1eb9c )
+        # Smart Plug #5 heater (mss210p): OnlineStatus.ONLINE ( 2311165157777351070148e1e9e1ed4a )
+
         WEREBEAR = "2106074309706690852248e1e97229bb"
-        
-        if (dev.uuid == WEREBEAR):
-            print(f"--------------------------------------------------")
-            print(f"Turning on {dev.name}...")
-            await dev.async_turn_on(channel=0)
-            # print("Waiting a bit before turing it off")
-            # await asyncio.sleep(5)
-            # print(f"Turing off {dev.name}")
-            # await dev.async_turn_off(channel=0)
+        PLUG6 = "2311169817714451070148e1e9e1eb9c"
+
+        for plug in pplugs: 
+          print(plug.uuid)
+          if (plug.uuid == PLUG6):
+              print(f"------------- PLUG6 -------------------------------------")
+              print(f"Turning off {dev.name}...")
+              await plug.async_turn_off(channel=0)
+              print("Waiting a bit before turing it on")
+              await asyncio.sleep(5)
+              print(f"Turing on {dev.name}")
+              await plug.async_turn_on(channel=0)
 
     # Close the manager and logout from http_api
     manager.close()
