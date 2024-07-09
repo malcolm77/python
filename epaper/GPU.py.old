@@ -18,30 +18,47 @@ logging.basicConfig(level=logging.INFO)
 
 font_height = 48
 
-def get_gpu_info():
-  gpu_info = []
+def get_gpu():
   try:
     url = requests.get("http://mcpc:9835/metrics",timeout=5)
     for line in url.text.splitlines():
       if "nvidia_smi_utilization_gpu_ratio{uuid=\"72f02a28-5140-325e-ba49-1ae77c6b4e30\"}" in line:
+        # print(line)
         try:
           gpu = int(line[-2:])
+          # print(str(gpu) + "%" )
         except:
           gpu = 0
-      elif "nvidia_smi_temperature_gpu{uuid=\"72f02a28-5140-325e-ba49-1ae77c6b4e30\"}" in line:
+  except:
+    gpu = 0
+  return str(gpu) + " %"
+
+def get_gtemp():
+  try:
+    url = requests.get("http://mcpc:9835/metrics",timeout=5)
+    for line in url.text.splitlines():
+      if "nvidia_smi_temperature_gpu{uuid=\"72f02a28-5140-325e-ba49-1ae77c6b4e30\"}" in line:
+        try:
+          # print(line)
+          gtemp = int(line[-2:])
+        except:
+          gtemp = 0
+  except:
+    gtemp = 0
+  return str(gtemp) + " C"
+
+def get_gfan():
+  try:
+    url = requests.get("http://mcpc:9835/metrics",timeout=5)
+    for line in url.text.splitlines():
+      if "nvidia_smi_fan_speed_ratio{uuid=\"72f02a28-5140-325e-ba49-1ae77c6b4e30\"}" in line:
         try:
           gtemp = int(line[-2:])
         except:
           gtemp = 0
-      elif "nvidia_smi_fan_speed_ratio{uuid=\"72f02a28-5140-325e-ba49-1ae77c6b4e30\"}" in line:
-        try:
-          gfan = int(line[-2:])
-        except:
-          gfan = 0
-      gpu_info = [gpu,gtemp,gfan]
   except:
-    gpu_info = [-1,-1,-1]
-  return gpu_info
+    gtemp = 0
+  return str(gtemp) + " %"
 
 def cleanup():
   epd.init()
@@ -73,22 +90,19 @@ try:
     epd.displayPartBaseImage(epd.getbuffer(time_image))
     num = 0
     while (True):
-        gpu_info = get_gpu_info()
-
         # time_draw.rectangle((12, 8, 220, 105), fill = 255)
         time_draw.rectangle((0, 0, 250, 122), fill = 255)
 
         time_draw.text((12,0), "GPU usage", font = smallfont, fill = 0)
-        time_draw.text((12, 8), str(gpu_info[0]), font = myfont, fill = 0)
+        time_draw.text((12, 8), get_gpu(), font = myfont, fill = 0)
 
         time_draw.text((12,font_height+font_height+12), "GPU Temp", font = smallfont, fill = 0)
-        time_draw.text((12, 8+font_height), str(gpu_info[1]), font = myfont, fill = 0)
+        time_draw.text((12, 8+font_height), get_gtemp(), font = myfont, fill = 0)
 
         time_draw.text((130,0), "FAN Speed", font = smallfont, fill = 0)
-        time_draw.text((130, 8), str(gpu_info[2]), font = myfont, fill = 0)
+        time_draw.text((130, 8), get_gfan(), font = myfont, fill = 0)
 
         time_draw.text((130, 8+font_height), time.strftime('%I:%M'), font = myfont, fill = 0)
-        time_draw.text((130, font_height+font_height+12), time.strftime('%A, %d/%m/%y'), font = smallfont, fill = 0)
 
         epd.displayPartial(epd.getbuffer(time_image))
         time.sleep(10)
@@ -104,7 +118,7 @@ except IOError as e:
     logging.info(e)
     
 except KeyboardInterrupt:    
-    logging.info("ctrl + c: exiting....")
+    logging.info("ctrl + c:")
     # epd2in13_V3.epdconfig.module_exit(cleanup=True)
     cleanup()
     exit()
