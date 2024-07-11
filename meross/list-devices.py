@@ -1,5 +1,6 @@
 import asyncio
 import os
+import logging
 
 from meross_iot.http_api import MerossHttpClient
 from meross_iot.manager import MerossManager
@@ -7,11 +8,13 @@ from meross_iot.manager import MerossManager
 EMAIL = "malcolmchalmers@hotmail.com" #os.environ.get('MEROSS_EMAIL') or "YOUR_MEROSS_CLOUD_EMAIL"
 PASSWORD = "Stargat3" #os.environ.get('MEROSS_PASSWORD') or "YOUR_MEROSS_CLOUD_PASSWORD"
 
+meross_root_logger = logging.getLogger("meross_iot")
+meross_root_logger.setLevel(logging.WARNING)
+
 
 async def main():
     # Setup the HTTP client API from user-password
     http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD, api_base_url="https://iot.meross.com")
-    print("http")
 
     # Setup and start the device manager
     manager = MerossManager(http_client=http_api_client)
