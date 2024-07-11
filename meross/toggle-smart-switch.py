@@ -1,11 +1,15 @@
 import asyncio
 import os
 import os
+import logging
 from meross_iot.http_api import MerossHttpClient
 from meross_iot.manager import MerossManager
 
 EMAIL = "malcolmchalmers@hotmail.com" # os.environ.get('MEROSS_EMAIL') or "YOUR_MEROSS_CLOUD_EMAIL"
 PASSWORD = "Stargat3" # os.environ.get('MEROSS_PASSWORD') or "YOUR_MEROSS_CLOUD_PASSWORD"
+
+meross_root_logger = logging.getLogger("meross_iot")
+meross_root_logger.setLevel(logging.ERROR)
 
 
 async def main():
@@ -18,8 +22,9 @@ async def main():
 
     # Retrieve all the MSS310 devices that are registered on this account
     await manager.async_device_discovery()
-    plugs = manager.find_devices(device_type="mss210")
-    pplugs = manager.find_devices(device_type="mss210p")
+    mss210_plugs = manager.find_devices(device_type="mss210")
+    mss210p_plugs = manager.find_devices(device_type="mss210p")
+    plugs = mss210_plugs + mss210p_plugs
 
     if len(plugs) < 1:
         print("No MSS310 plugs found...")
@@ -42,16 +47,15 @@ async def main():
         WEREBEAR = "2106074309706690852248e1e97229bb"
         PLUG6 = "2311169817714451070148e1e9e1eb9c"
 
-        for plug in pplugs: 
-          print(plug.uuid)
+        for plug in plugs: 
           if (plug.uuid == PLUG6):
               print(f"------------- PLUG6 -------------------------------------")
-              print(f"Turning off {dev.name}...")
-              await plug.async_turn_off(channel=0)
+              print(f"Turning off {plug.name}...")
+              # await plug.async_turn_off(channel=0)
               print("Waiting a bit before turing it on")
               await asyncio.sleep(5)
-              print(f"Turing on {dev.name}")
-              await plug.async_turn_on(channel=0)
+              print(f"Turing on {plug.name}")
+              # await plug.async_turn_on(channel=0)
 
     # Close the manager and logout from http_api
     manager.close()
