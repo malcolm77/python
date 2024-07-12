@@ -1,8 +1,9 @@
 import sys
 import asyncio
 import os
-import os
 import logging
+import glob
+import time
 from meross_iot.http_api import MerossHttpClient
 from meross_iot.manager import MerossManager
 
@@ -11,6 +12,31 @@ PASSWORD = "Stargat3" # os.environ.get('MEROSS_PASSWORD') or "YOUR_MEROSS_CLOUD_
 
 meross_root_logger = logging.getLogger("meross_iot")
 meross_root_logger.setLevel(logging.ERROR)
+
+os.system('modprobe w1-gpio')
+os.system('modprobe w1-therm')
+
+base_dir = '/sys/bus/w1/devices/'
+device_folder = glob.glob(base_dir + '28*')[0]
+device_file = device_folder + '/w1_slave'
+
+def read_temp_raw():
+    f = open(device_file, 'r')
+    lines = f.readlines()
+    f.close()
+    return lines
+
+def read_temp():
+    lines = read_temp_raw()
+    while lines[0].strip()[-3:] != 'YES':
+        time.sleep(0.2)
+        lines = read_temp_raw()
+    equals_pos = lines[1].find('t=')
+    if equals_pos != -1:
+        temp_string = lines[1][equals_pos+2:]
+        temp_c = float(temp_string) / 1000.0
+        temp_f = temp_c * 9.0 / 5.0 + 32.0
+        return temp_c  # , temp_f
 
 async def main():
     # Setup the HTTP client API from user-password
@@ -37,27 +63,28 @@ async def main():
         #  connection goes down)
         await dev.async_update()
 
-        Smart_Plug = ""
-        if (sys.argv[1] == "4"):
-              Smart_Plug = "2201055377768890865248e1e98469d4"
-        elif (sys.argv[1] == "1"):
-              Smart_Plug = "2106075239879690852248e1e9722751"
-        elif (sys.argv[1] == "3"):
-              Smart_Plug = "2106074309706690852248e1e97229bb"
-        elif (sys.argv[1] == "2"):
-              Smart_Plug = "2309069934761851070348e1e9d98391"
-        elif (sys.argv[1] == "6"):
-              Smart_Plug = "2311169817714451070148e1e9e1eb9c"
-        elif (sys.argv[1] == "5"):
-              Smart_Plug = "2311165157777351070148e1e9e1ed4a"
-        else:
-              Smart_Plug = ""
+        if (len(sys.argv)):
+          if (sys.argv[1] == "4"):
+                Smart_Plug = "2201055377768890865248e1e98469d4"
+          elif (sys.argv[1] == "1"):
+                Smart_Plug = "2106075239879690852248e1e9722751"
+          elif (sys.argv[1] == "3"):
+                Smart_Plug = "2106074309706690852248e1e97229bb"
+          elif (sys.argv[1] == "2"):
+                Smart_Plug = "2309069934761851070348e1e9d98391"
+          elif (sys.argv[1] == "6"):
+                Smart_Plug = "2311169817714451070148e1e9e1eb9c"
+          elif (sys.argv[1] == "5"):
+                Smart_Plug = "2311165157777351070148e1e9e1ed4a"
+          else:
+                Smart_Plug = ""
 
         # print (str(sys.argv[1])+":" + Smart_Plug)
 
         for plug in plugs: 
           if (plug.uuid == Smart_Plug):
-              print(f"------------- " + plug.name + " -------------------------------------")
+              print(f"------------------------- " + plug.name + " -------------------------------------")
+              print(f"The temperature is: " + str(read_temp()) )
               print(f"Turning off {plug.name}...")
               # await plug.async_turn_off(channel=0)
               print("Waiting a bit before turing it on")
