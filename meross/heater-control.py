@@ -1,3 +1,4 @@
+import sys
 import asyncio
 import os
 import os
@@ -10,7 +11,6 @@ PASSWORD = "Stargat3" # os.environ.get('MEROSS_PASSWORD') or "YOUR_MEROSS_CLOUD_
 
 meross_root_logger = logging.getLogger("meross_iot")
 meross_root_logger.setLevel(logging.ERROR)
-
 
 async def main():
     # Setup the HTTP client API from user-password
@@ -37,18 +37,26 @@ async def main():
         #  connection goes down)
         await dev.async_update()
 
-        Smart_Plug_4 = "2201055377768890865248e1e98469d4"
-        # Smart Plug #1 Party Lights (mss210): OnlineStatus.ONLINE ( 2106075239879690852248e1e9722751 )
-        # Smart Plug #3 Werebear (mss210): OnlineStatus.ONLINE ( 2106074309706690852248e1e97229bb )
-        # Smart Plug #2 DL360 (mss210p): OnlineStatus.ONLINE ( 2309069934761851070348e1e9d98391 )
-        Smart_Plug_6 = "2311169817714451070148e1e9e1eb9c"
-        # Smart Plug #5 heater (mss210p): OnlineStatus.ONLINE ( 2311165157777351070148e1e9e1ed4a )
+        Smart_Plug = ""
+        if (sys.argv[1] == "4"):
+              Smart_Plug = "2201055377768890865248e1e98469d4"
+        elif (sys.argv[1] == "1"):
+              Smart_Plug = "2106075239879690852248e1e9722751"
+        elif (sys.argv[1] == "3"):
+              Smart_Plug = "2106074309706690852248e1e97229bb"
+        elif (sys.argv[1] == "2"):
+              Smart_Plug = "2309069934761851070348e1e9d98391"
+        elif (sys.argv[1] == "6"):
+              Smart_Plug = "2311169817714451070148e1e9e1eb9c"
+        elif (sys.argv[1] == "5"):
+              Smart_Plug = "2311165157777351070148e1e9e1ed4a"
+        else:
+              Smart_Plug = ""
 
-        WEREBEAR = "2106074309706690852248e1e97229bb"
-        PLUG6 = "2311169817714451070148e1e9e1eb9c"
+        # print (str(sys.argv[1])+":" + Smart_Plug)
 
         for plug in plugs: 
-          if (plug.uuid == Smart_Plug_4):
+          if (plug.uuid == Smart_Plug):
               print(f"------------- " + plug.name + " -------------------------------------")
               print(f"Turning off {plug.name}...")
               # await plug.async_turn_off(channel=0)
@@ -62,8 +70,7 @@ async def main():
     await http_api_client.async_logout()
 
 if __name__ == '__main__':
-    if os.name == 'nt':
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    # print (sys.argv[1])
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
     loop.stop()
