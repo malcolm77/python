@@ -27,7 +27,7 @@ async def main():
     # Print them
     print("I've found the following devices:")
     for dev in meross_devices:
-        print(f"- {dev.name} ({dev.type}): {dev.online_status} ( {dev.uuid} )")
+        print(f"- NAME:{dev.name} TYPE:{dev.type}) ONLINE-STATUS:{dev.online_status} UUID:{dev.uuid}")
 
     # Close the manager and logout from http_api
     manager.close()

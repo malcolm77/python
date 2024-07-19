@@ -38,24 +38,25 @@ async def main():
         await dev.async_update()
 
         Smart_Plug_4 = "2201055377768890865248e1e98469d4"
-        # Smart Plug #1 Party Lights (mss210): OnlineStatus.ONLINE ( 2106075239879690852248e1e9722751 )
-        # Smart Plug #3 Werebear (mss210): OnlineStatus.ONLINE ( 2106074309706690852248e1e97229bb )
-        # Smart Plug #2 DL360 (mss210p): OnlineStatus.ONLINE ( 2309069934761851070348e1e9d98391 )
+        Smart_Plug_1 = "2106075239879690852248e1e9722751" #1 Party Lights
+        Smart_Plug_3 = "2106074309706690852248e1e97229bb" #3 Werebear
+        Smart_Plug_2 = "2309069934761851070348e1e9d98391" #2 DL360
         Smart_Plug_6 = "2311169817714451070148e1e9e1eb9c"
-        # Smart Plug #5 heater (mss210p): OnlineStatus.ONLINE ( 2311165157777351070148e1e9e1ed4a )
-
-        WEREBEAR = "2106074309706690852248e1e97229bb"
-        PLUG6 = "2311169817714451070148e1e9e1eb9c"
+        Smart_Plug_5 = "2311165157777351070148e1e9e1ed4a"
+        
 
         for plug in plugs: 
-          if (plug.uuid == Smart_Plug_4):
+          if (plug.uuid == Smart_Plug_6):
               print(f"------------- " + plug.name + " -------------------------------------")
               print(f"Turning off {plug.name}...")
-              # await plug.async_turn_off(channel=0)
+              await plug.async_turn_off(channel=0)
               print("Waiting a bit before turing it on")
+              await plug.async_update()
+              state = plug.is_on(channel=0)
+              print(state)
               await asyncio.sleep(5)
               print(f"Turing on {plug.name}")
-              # await plug.async_turn_on(channel=0)
+              await plug.async_turn_on(channel=0)
 
     # Close the manager and logout from http_api
     manager.close()
