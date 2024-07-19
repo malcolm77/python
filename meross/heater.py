@@ -44,6 +44,8 @@ def read_temp():
         return temp_c  # , temp_f
 
 async def toggle_power(pwr_state):
+    global plug_state   # make sure to use the global varitable, not create a new local one. stupid python  
+
     # Setup the HTTP client API from user-password
     http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD, api_base_url="https://iot.meross.com")
 
@@ -84,7 +86,7 @@ async def toggle_power(pwr_state):
                 await plug.async_update()
                 plug_state = plug.is_on(channel=0)
                 # print(plug_state)
-                print("locat state:" + str(plug_state) )
+                print("local state: " + str(plug_state) )
 
     # Close the manager and logout from http_api
     manager.close()
@@ -97,7 +99,6 @@ async def toggle_power(pwr_state):
 #         return "OFF"
 
 def get_state():
-    # print("get_gplug_state)
     if plug_state == True:
         return "ON"
     elif plug_state == False:
@@ -112,7 +113,7 @@ def main():
 
     print ("--------------- START ----------------------")
     asyncio.run( toggle_power(2) ) # get current state and set global variable to value
-    print ( "initial plug_state: " + get_state() ) # print global value
+    print ( "initial plug_state: " + get_state() ) 						# print global value
     print ("----------------- END --------------------")
 
     while True:
