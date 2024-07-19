@@ -100,8 +100,10 @@ def get_state():
     # print("get_gplug_state)
     if plug_state == True:
         return "ON"
-    else:
+    elif plug_state == False:
         return "OFF"
+    else:
+        return "UNKNOWN"
 
 
 def main():
@@ -110,7 +112,7 @@ def main():
 
     print ("--------------- START ----------------------")
     asyncio.run( toggle_power(2) ) # get current state and set global variable to value
-    print ( "initial plug_state: " + str(plug_state) ) # print global value
+    print ( "initial plug_state: " + get_state() ) # print global value
     print ("----------------- END --------------------")
 
     while True:
