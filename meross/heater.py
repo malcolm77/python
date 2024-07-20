@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import glob
 import time
@@ -16,8 +17,8 @@ os.system('modprobe w1-therm')
 base_dir = '/sys/bus/w1/devices/'
 device_folder = glob.glob(base_dir + '28*')[0]
 device_file = device_folder + '/w1_slave'
-MAX = 15
-MIX = 14
+MAX = 13
+MIN = 12
 ON  = 1
 OFF = 0
 plug_state = True
@@ -86,7 +87,7 @@ async def toggle_power(pwr_state):
                 await plug.async_update()
                 plug_state = plug.is_on(channel=0)
                 # print(plug_state)
-                print("local state: " + str(plug_state) )
+                # print("local state: " + str(plug_state) )
 
     # Close the manager and logout from http_api
     manager.close()
@@ -99,6 +100,7 @@ async def toggle_power(pwr_state):
 #         return "OFF"
 
 def get_state():
+    asyncio.run( toggle_power(2) )
     if plug_state == True:
         return "ON"
     elif plug_state == False:
@@ -120,13 +122,14 @@ def main():
             temperature = read_temp()
             print("Current temperature: " + str(temperature) + ", heater is: " + get_state() )
         
-            if temperature <= MIX and power_state == OFF: #plug_state == False:
+                            # 12
+            if temperature <= MIN and plug_state == False: # power_state == OFF: # plug_state == False:
                     print("!!!    Temperature low      !!! - turning ON heater.") # (" + str(temperature) + ":" + show_state(power_state) + ")" )
                     power_state = ON
                     asyncio.run( toggle_power(ON) )
 
-
-            if temperature >= MAX and power_state == ON: #plug_state == True:
+                            # 13
+            if temperature >= MAX and plug_state == True:   # power_state == ON: # plug_state == True:
                     print("!!!     Temperature high    !!! - turning OFF heater.") # (" + str(temperature) + ":" + show_state(power_state) + ")" )
                     power_state = OFF
                     asyncio.run( toggle_power(OFF) )
@@ -137,3 +140,12 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# except IOError as e:
+#     logging.info(e)
+# 
+# except KeyboardInterrupt:
+#     logging.info("ctrl + c:")
+#     epd2in13_V3.epdconfig.module_exit(cleanup=True)
+#     exit()
+

@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python3
 import asyncio
 import os
 import os
@@ -41,12 +41,12 @@ async def get_state():
                 await plug.async_update()
                 global plug_state 
                 plug_state = plug.is_on(channel=0)
-                print( "get_state:" + str(plug_state) )
+                print( "get_state: " + str(plug_state) )
 
 
 def main():
     asyncio.run( get_state() )
-    print( "main:" + str(plug_state) ) 
+    print( "main: " + str(plug_state) ) 
 
 if __name__ == '__main__':
     main()
