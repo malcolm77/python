@@ -17,12 +17,14 @@ os.system('modprobe w1-therm')
 base_dir = '/sys/bus/w1/devices/'
 device_folder = glob.glob(base_dir + '28*')[0]
 device_file = device_folder + '/w1_slave'
-MAX = 13
-MIN = 12
 ON  = 1
 OFF = 0
 plug_state = True
 Smart_Plug_4 = "2201055377768890865248e1e98469d4"
+
+MAX = 19      # this or more and the heater turns off
+MIN = 18      # less than this and the heater turns on
+
  
 ### Get raw temperature ### 
 def read_temp_raw():
@@ -110,28 +112,27 @@ def get_state():
 
 
 def main():
-    ### Continually read a display temperature ###
-    power_state = OFF
+    # power_state = OFF
 
     print ("--------------- START ----------------------")
-    asyncio.run( toggle_power(2) ) # get current state and set global variable to value
-    print ( "initial plug_state: " + get_state() ) 						# print global value
+    # asyncio.run( toggle_power(2) ) # get current state and set global variable to value
+    print ( "Initial plug state: " + get_state() ) 						# print global value
     print ("----------------- END --------------------")
 
     while True:
             temperature = read_temp()
-            print("Current temperature: " + str(temperature) + ", heater is: " + get_state() )
+            print(f"Current temperature: {temperature:.3f} heater is: {get_state()} ")
         
-                            # 12
-            if temperature <= MIN and plug_state == False: # power_state == OFF: # plug_state == False:
-                    print("!!!    Temperature low      !!! - turning ON heater.") # (" + str(temperature) + ":" + show_state(power_state) + ")" )
-                    power_state = ON
+            if temperature < MIN and plug_state == False: # power_state == OFF: # plug_state == False:
+                    print("!!!    Temperature low      !!!")
+                    print("!!!   Turning ON heater     !!!") 
+                    # power_state = ON
                     asyncio.run( toggle_power(ON) )
 
-                            # 13
             if temperature >= MAX and plug_state == True:   # power_state == ON: # plug_state == True:
-                    print("!!!     Temperature high    !!! - turning OFF heater.") # (" + str(temperature) + ":" + show_state(power_state) + ")" )
-                    power_state = OFF
+                    print("!!!     Temperature high    !!!")
+                    print("!!!    turning OFF heater   !!!") 
+                    # power_state = OFF
                     asyncio.run( toggle_power(OFF) )
 
             time.sleep(10)
