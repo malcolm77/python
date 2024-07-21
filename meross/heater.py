@@ -140,13 +140,14 @@ def main():
 
 
 if __name__ == '__main__':
+  try:
     main()
 
-# except IOError as e:
-#     logging.info(e)
-# 
-# except KeyboardInterrupt:
-#     logging.info("ctrl + c:")
-#     epd2in13_V3.epdconfig.module_exit(cleanup=True)
-#     exit()
+  except IOError as e:
+    logging.info(e)
+
+  except KeyboardInterrupt:
+      logging.info("ctrl + c was pressed, exiting")
+      asyncio.run( toggle_power(OFF) )
+      exit()
 
