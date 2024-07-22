@@ -78,13 +78,13 @@ try:
         time_draw.rectangle((0, 0, 250, 122), fill = 255)
 
         time_draw.text((12,0), "GPU usage", font = smallfont, fill = 0)
-        time_draw.text((12, 8), str(gpu_info[0]), font = myfont, fill = 0)
+        time_draw.text((12, 8), str(gpu_info[0])+"%", font = myfont, fill = 0)
 
         time_draw.text((12,font_height+font_height+12), "GPU Temp", font = smallfont, fill = 0)
-        time_draw.text((12, 8+font_height), str(gpu_info[1]), font = myfont, fill = 0)
+        time_draw.text((12, 8+font_height), str(gpu_info[1])+"C", font = myfont, fill = 0)
 
         time_draw.text((130,0), "FAN Speed", font = smallfont, fill = 0)
-        time_draw.text((130, 8), str(gpu_info[2]), font = myfont, fill = 0)
+        time_draw.text((130, 8), str(gpu_info[2])+"%", font = myfont, fill = 0)
 
         time_draw.text((130, 8+font_height), time.strftime('%I:%M'), font = myfont, fill = 0)
         time_draw.text((130, font_height+font_height+12), time.strftime('%A, %d/%m/%y'), font = smallfont, fill = 0)
